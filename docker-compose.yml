@@ -1,4 +1,63 @@
 services:
+ appwrite:
+ image: appwrite/appwrite:latest
+ container_name: appwrite
+ restart: unless-stopped
+ networks:
+ - appwrite
+ depends_on:
+ - mariadb
+ - redis
+ volumes:
+ - appwrite-uploads:/storage/uploads
+ - appwrite-cache:/storage/cache
+ - appwrite-config:/storage/config
+ - appwrite-certificates:/storage/certificates
+ - appwrite-functions:/storage/functions
+ environment:
+ - _APP_ENV=production
+ - _APP_DOMAIN=options-x.co
+ - _APP_DOMAIN_TARGET=72.60.104.172
+ - _APP_REGION=YOUR_REGION
+ - _APP_ENV_SSL=false
+ - _APP_DB_HOST=mariadb
+ - _APP_DB_PORT=3306
+ - _APP_DB_SCHEMA=appwrite
+ - _APP_DB_USER=appwrite
+ - _APP_DB_PASS=appwrite
+ - _APP_DB_ROOT_PASS=rootpassword
+ - _APP_REDIS_HOST=redis
+ - _APP_REDIS_PORT=6379
+ - _APP_OPENSSL_KEY_V1=GENERATE_A_RANDOM_SECRET
+
+ mariadb:
+ image: mariadb:10.11
+ container_name: appwrite-mariadb
+ restart: unless-stopped
+ networks:
+ - appwrite
+ volumes:
+ - mariadb-data:/var/lib/mysql
+ environment:
+ - MYSQL_ROOT_PASSWORD=rootpassword
+ - MYSQL_DATABASE=appwrite
+ - MYSQL_USER=appwrite
+ - MYSQL_PASSWORD=appwrite
+
  redis:
  image: redis:7
+ container_name: appwrite-redis
  restart: unless-stopped
+ networks:
+ - appwrite
+
+networks:
+ appwrite:
+
+volumes:
+ appwrite-uploads:
+ appwrite-cache:
+ appwrite-config:
+ appwrite-certificates:
+ appwrite-functions:
+ mariadb-data:
